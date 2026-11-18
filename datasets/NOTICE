@@ -1,0 +1,52 @@
+# FraudLens AI — Dataset Notices and Attributions
+
+This document sets forth the provenance, copyright ownership, and licensing terms governing the datasets included in the FraudLens AI project.
+
+---
+
+## 1. Third-Party Academic Dataset: UCI SMS Spam Collection
+
+### Attribution & Citation
+- **Dataset Title:** SMS Spam Collection
+- **Original Authors:** Tiago A. Almeida and José María Gómez Hidalgo
+- **Academic Citation:**
+  > Almeida, T. A., & Gómez Hidalgo, J. M. (2012). *SMS Spam Collection* [Dataset]. UCI Machine Learning Repository.
+- **Persistent Identifier (DOI):** [https://doi.org/10.24432/C5CC84](https://doi.org/10.24432/C5CC84)
+- **Licence:** Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))
+
+### Project Usage & Scope
+- **Files in Repository:** `datasets/SMSSpamCollection`, `datasets/sms_dataset.csv`
+- **Role:** Used exclusively for initial exploratory analysis and baseline architecture benchmarking during early project phases.
+- **Ownership Notice:** The UCI SMS Spam Collection is a third-party academic dataset. It is **not** owned by the FraudLens AI project or its contributors. All rights and academic credit remain with the original authors.
+- **Redistribution Terms:** In accordance with the CC BY 4.0 licence, this dataset is shared with appropriate attribution, link to licence, and indication of source.
+
+---
+
+## 2. Project-Authored Synthetic Datasets: Indian SMS Threat Corpora
+
+### Overview & Authorship
+- **Datasets:**
+  - `datasets/training/indian_sms_train.csv` (400 samples: 200 legitimate, 200 scam)
+  - `datasets/evaluation/indian_sms_final_locked.csv` (300 samples: 150 legitimate, 150 scam; locked evaluation benchmark)
+  - `datasets/evaluation/indian_sms_eval.csv` (100 samples: validation split)
+- **Authorship:** Authored directly by the FraudLens AI Project Contributors.
+- **Purpose:** Developed to evaluate smishing detection across Indian linguistic contexts, including English, Hindi (Devanagari script), and Hinglish (Latin-script transliterated colloquial Hindi).
+
+### Synthetic Privacy & Safety Commitments
+- **Zero Real Personal Data:** All telephone numbers, virtual payment addresses (VPAs), uniform resource locators (URLs), banking institution names, and subscriber identities are entirely synthetic and simulated.
+- **No Compromised Credentials:** The datasets contain no authentic banking credentials, passwords, OTPs, or active malicious infrastructure.
+
+### Distribution & Licensing
+- These synthetic datasets are made available for non-commercial research, academic benchmarking, and defensive cyber safety evaluations.
+- They are governed independently from the project software source code under the [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/) licence.
+
+---
+
+## 3. Summary of Dataset Licensing Matrix
+
+| Dataset Component | File Location | Origin / Authors | Governing Licence |
+|---|---|---|---|
+| SMS Spam Collection | `datasets/SMSSpamCollection` | Almeida & Gómez Hidalgo | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Indian SMS Training Set | `datasets/training/indian_sms_train.csv` | FraudLens AI Contributors | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) |
+| Indian SMS Evaluation Set | `datasets/evaluation/indian_sms_final_locked.csv` | FraudLens AI Contributors | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) |
+| Indian SMS Validation Split | `datasets/evaluation/indian_sms_eval.csv` | FraudLens AI Contributors | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) |
