@@ -342,8 +342,8 @@ The model candidate was evaluated against an independent, locked test benchmark 
 
 ## 📚 Dataset & Third-Party Attribution
 
-- **UCI SMS Spam Collection:** Portions of initial baseline testing utilized the academic SMS Spam Collection dataset created by **Tiago A. Almeida and José María Gómez Hidalgo** (2012). This third-party dataset is utilized strictly for academic comparison and is attributed to its original authors. It is not owned by FraudLens AI.
-- **Indian Financial SMS Corpora:** The Indian SMS training set (`indian_sms_train.csv`) and evaluation benchmarks (`indian_sms_final_locked.csv`) were synthetically authored by the project contributors simulating real-world cybercrime patterns without containing any real personal information, authentic telephone numbers, or private account data.
+- **UCI SMS Spam Collection:** Baseline comparison and 5,171 deduplicated messages in the combined multilingual training corpus utilized the academic SMS Spam Collection dataset created by **Tiago A. Almeida and José María Gómez Hidalgo** (2012; DOI: [10.24432/C5CC84](https://doi.org/10.24432/C5CC84); CC BY 4.0). This third-party dataset is utilized with full attribution to its original authors. It is not owned by FraudLens AI.
+- **Indian Financial SMS Corpora:** The Indian SMS training set (`indian_sms_train.csv`, 352 train partition samples) and evaluation benchmarks (`indian_sms_final_locked.csv`, 300 locked samples) were synthetically authored by the project contributors simulating real-world cybercrime patterns without containing any real personal information, authentic telephone numbers, or private account data (governed separately under CC BY-NC 4.0).
 
 ---
 
@@ -390,6 +390,8 @@ FraudLens AI adopts a dual-tier licensing and attribution framework distinguishi
    - Complete dataset citations and licensing matrices are documented in **[`datasets/NOTICE`](datasets/NOTICE)**.
 
 3. **Machine Learning Model Artifacts (Non-MIT):**
-   - Trained model weights, vectorizer parameters, and serialized pipelines (`models/sms_model.joblib`) are compiled binary artifacts derived from training algorithms and datasets.
-   - Model weights are **not automatically MIT-licensed**. They are distributed under the [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) framework strictly for non-commercial research, academic benchmarking, and cyber defensive evaluation.
-   - Comprehensive provenance, architecture specifications, checksums, and strict operational boundaries are documented in **[`models/NOTICE.md`](models/NOTICE.md)**.
+   - Trained model weights, vectorizer parameters, and serialized pipelines (`models/sms_model.joblib`) are compiled binary artifacts derived from training algorithms and multi-source datasets.
+   - Model weights are **not automatically MIT-licensed**.
+   - Because the active model was trained on a combination of CC BY 4.0 academic data (UCI SMS Spam Collection) and CC BY-NC 4.0 synthetic data, FraudLens AI **does not automatically impose CC BY-NC 4.0** on the combined binary artifact. The model's independent redistribution and commercial licensing status **requires further professional legal review**.
+   - For academic evaluation, defensive cyber safety research, and personal testing, the model is provided with full dual-attribution to Almeida & Hidalgo (UCI, CC BY 4.0) and FraudLens AI contributors (synthetic Indic corpora, CC BY-NC 4.0).
+   - Complete provenance, multi-source vocabulary statistics, checksums, and legal disclaimers are documented in **[`models/NOTICE.md`](models/NOTICE.md)**.

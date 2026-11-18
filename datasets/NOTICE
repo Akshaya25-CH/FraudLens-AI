@@ -16,7 +16,7 @@ This document sets forth the provenance, copyright ownership, and licensing term
 
 ### Project Usage & Scope
 - **Files in Repository:** `datasets/SMSSpamCollection`, `datasets/sms_dataset.csv`
-- **Role:** Used exclusively for initial exploratory analysis and baseline architecture benchmarking during early project phases.
+- **Role:** Used for exploratory analysis and baseline architecture benchmarking, as well as contributing 5,171 unique deduplicated records to the combined training corpus for the active multilingual classifier (`models/sms_model.joblib`).
 - **Ownership Notice:** The UCI SMS Spam Collection is a third-party academic dataset. It is **not** owned by the FraudLens AI project or its contributors. All rights and academic credit remain with the original authors.
 - **Redistribution Terms:** In accordance with the CC BY 4.0 licence, this dataset is shared with appropriate attribution, link to licence, and indication of source.
 
