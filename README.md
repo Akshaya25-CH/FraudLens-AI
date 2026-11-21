@@ -106,6 +106,24 @@ flowchart TD
 
 ---
 
+## 🤖 AI Models and APIs Used
+
+### AI Models and Detection Engines
+- **SMS Fraud Detection:** TF-IDF (word and character n-grams) with Logistic Regression using Scikit-learn.
+- **URL Phishing Detection:** Offline structural heuristic analysis.
+- **UPI Fraud Detection:** Rule-based heuristic engine with VPA syntax validation and scam-pattern detection.
+
+### Backend REST APIs
+- `GET /health` – Backend and model availability.
+- `POST /scan` – SMS fraud detection.
+- `POST /scan-url` – URL phishing analysis.
+- `POST /scan-payment` – UPI and payment fraud analysis.
+
+### External API Usage
+- No external third-party APIs are required for the core detection engines.
+- Backend communication uses FastAPI REST endpoints.
+
+
 ## 📦 Directory Structure
 
 ```text
