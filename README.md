@@ -145,7 +145,7 @@ FraudLens-AI/
 
 ### 1. Clone the Repository
 ```powershell
-git clone https://github.com/your-username/FraudLens-AI.git
+git clone https://github.com/Akshaya25-CH/FraudLens-AI.git
 cd FraudLens-AI
 ```
 
