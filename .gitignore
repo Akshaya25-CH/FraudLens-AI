@@ -63,10 +63,12 @@ desktop.ini
 *.sln
 *.sw?
 
-# Explicit Inclusions: Preserve essential ML models and datasets
+# Public release: preserve licensing notice, exclude model binaries and experiment artifacts
 !models/
-!models/*.joblib
-!models/experiments/
-!models/experiments/*.joblib
+!models/NOTICE.md
 !datasets/
 !datasets/**
+models/*.joblib
+models/**/*.joblib
+models/experiments/
+models/model_checksums.json

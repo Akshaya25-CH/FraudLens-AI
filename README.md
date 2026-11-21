@@ -21,6 +21,10 @@ The rapid acceleration of instant retail digital payments in India via the Unifi
 
 FraudLens AI provides real-time, explainable, and privacy-preserving detection engines to counter these threats without transmitting private user financial data to third-party tracking services.
 
+> [!IMPORTANT]
+> **SMS model availability:** The public source release does not include serialized SMS model binaries or experimental model artifacts. The SMS scanner requires a separately obtained, legally authorized `models/sms_model.joblib` file. Without it, the backend still starts and the URL and UPI scanners remain available, while `POST /scan` returns HTTP 503. See [`models/NOTICE.md`](models/NOTICE.md) for model provenance and licensing information.
+
+
 ---
 
 ## 🚀 Core Features & Engine Architecture
@@ -68,7 +72,9 @@ flowchart TD
         
         Router -->|"/scan"| Preprocessor["Multilingual Preprocessor (Normalizer & Cleaner)"]
         Preprocessor --> FeatureUnion["FeatureUnion (Word N-Grams + Char N-Grams)"]
-        FeatureUnion --> MLClassifier["Logistic Regression Classifier (sms_model.joblib)"]
+        FeatureUnion --> ModelCheck{"Authorized SMS model available?"}
+       ModelCheck -->|Yes| MLClassifier["Logistic Regression Classifier"]
+       ModelCheck -->|No| SMSUnavailable["SMS unavailable (HTTP 503)"]
         MLClassifier --> SMSResponse["SMS Probabilistic Risk Assessment"]
 
         Router -->|"/scan-url"| URLParser["URL Syntax & Structural Lexical Parser"]
@@ -102,36 +108,31 @@ flowchart TD
 
 ## 📦 Directory Structure
 
-```
+```text
 FraudLens-AI/
-├── .gitignore                # Root Git ignore exclusions
-├── README.md                 # Project documentation
-├── run_backend.bat           # One-click Windows launcher for FastAPI backend
-├── run_frontend.bat          # One-click Windows launcher for Vite frontend
-├── backend/                  # Python FastAPI application
-│   ├── main.py               # REST API endpoints & CORS middleware
-│   ├── sms_preprocessor.py   # Indic transliteration & cleaning pipeline
-│   ├── url_scanner.py        # Static URL structural heuristic analyzer
-│   ├── upi_scanner.py        # UPI payment & VPA rule-based engine
-│   └── requirements.txt      # Python backend dependencies
-├── frontend/                 # React 19 + Vite frontend
-│   ├── package.json          # Node dependencies & build scripts
-│   ├── vite.config.js        # Vite build & bundle configuration
-│   └── src/
-│       ├── App.jsx           # Main layout, hash navigation & scanners
-│       ├── App.css           # Styling & responsive design rules
-│       ├── RiskAnalytics.jsx # Threat intelligence & Recharts visuals (lazy)
-│       ├── AdvancedScanHistory.jsx # Search, filtering & CSV export (lazy)
-│       └── SettingsDiagnostics.jsx # Telemetry, specs & privacy management (lazy)
-├── models/                   # Serialized model artifacts
-│   ├── sms_model.joblib      # Active frozen candidate model (Config D, C=10.0)
-│   ├── sms_model_baseline.joblib # Archived baseline model
-│   └── experiments/          # Candidate model experimental evaluations
-├── datasets/                 # Training & evaluation datasets
-│   ├── training/             # Indian SMS synthetic training corpus
-│   └── evaluation/           # Locked 300-sample evaluation benchmarks
-└── tests/                    # Comprehensive unit and regression test suite
+|-- .gitignore
+|-- README.md
+|-- LICENSE
+|-- run_backend.bat
+|-- run_frontend.bat
+|-- backend/
+|   |-- main.py
+|   |-- sms_preprocessor.py
+|   |-- url_scanner.py
+|   |-- upi_scanner.py
+|   `-- requirements.txt
+|-- frontend/
+|   |-- package.json
+|   |-- vite.config.js
+|   `-- src/
+|-- models/
+|   `-- NOTICE.md
+|-- datasets/
+|   `-- NOTICE
+`-- tests/
 ```
+
+**Public-release note:** Serialized model binaries and model experiment artifacts are excluded. Dataset availability is subject to the applicable licensing notices.
 
 ---
 
@@ -163,7 +164,11 @@ pip install -r backend\requirements.txt
 
 # Run backend unit tests to verify installation
 python -m unittest discover tests
+
+
 ```
+
+**SMS model requirement:** The public repository does not include the serialized SMS model. If you independently obtain an artifact you are authorized to use, place it at `models/sms_model.joblib` before starting the backend. Otherwise, the backend starts without SMS inference; URL and UPI scanning remain available.
 
 ### 3. Frontend Environment Setup
 Open a second PowerShell window or navigate to the frontend directory:
@@ -207,6 +212,9 @@ The FastAPI backend exposes the following RESTful endpoints:
 
 ### 1. `GET /health`
 Returns runtime engine diagnostics and model availability.
+
+The `model_loaded` field is `true` only when an SMS model artifact loads successfully. Without one, it is `false`; URL and payment scanning remain available.
+
 ```json
 {
   "status": "healthy",
@@ -222,6 +230,9 @@ Returns runtime engine diagnostics and model availability.
 
 ### 2. `POST /scan`
 Evaluates text messages for smishing and social engineering indicators.
+
+If the SMS model is unavailable, this endpoint responds with HTTP 503 until an authorized model artifact is supplied.
+
 - **Request Body:** `{"message": "string"}`
 - **Sample Request:**
   ```json
@@ -393,5 +404,5 @@ FraudLens AI adopts a dual-tier licensing and attribution framework distinguishi
    - Trained model weights, vectorizer parameters, and serialized pipelines (`models/sms_model.joblib`) are compiled binary artifacts derived from training algorithms and multi-source datasets.
    - Model weights are **not automatically MIT-licensed**.
    - Because the active model was trained on a combination of CC BY 4.0 academic data (UCI SMS Spam Collection) and CC BY-NC 4.0 synthetic data, FraudLens AI **does not automatically impose CC BY-NC 4.0** on the combined binary artifact. The model's independent redistribution and commercial licensing status **requires further professional legal review**.
-   - For academic evaluation, defensive cyber safety research, and personal testing, the model is provided with full dual-attribution to Almeida & Hidalgo (UCI, CC BY 4.0) and FraudLens AI contributors (synthetic Indic corpora, CC BY-NC 4.0).
+   - The serialized model artifact is excluded from this public release because its independent redistribution and commercial licensing status requires further professional legal review. Attribution alone does not establish redistribution rights.
    - Complete provenance, multi-source vocabulary statistics, checksums, and legal disclaimers are documented in **[`models/NOTICE.md`](models/NOTICE.md)**.

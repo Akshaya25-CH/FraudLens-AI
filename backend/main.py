@@ -1,3 +1,4 @@
+
 import sys
 from pathlib import Path
 from typing import Optional
@@ -15,13 +16,15 @@ import joblib
 from backend.url_scanner import analyze_url_structure
 from backend.upi_scanner import analyze_payment_fraud
 
+
 app = FastAPI(
     title="FraudLens AI",
     description="Machine Learning Based Financial Scam, URL Phishing & UPI Fraud Detection",
     version="2.2.0"
 )
 
-# CORS middleware for frontend communication (supports Vite dev & preview servers on localhost/127.0.0.1)
+
+# CORS middleware
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -44,15 +47,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load trained SMS model using reliable project-relative path
+
+# Load the SMS model when its artifact is available.
+# Public source releases may exclude model weights pending licensing review.
 MODEL_PATH = BASE_DIR / "models" / "sms_model.joblib"
 
-if not MODEL_PATH.exists():
-    raise FileNotFoundError(f"Model file not found at: {MODEL_PATH}")
+model = None
 
-model = joblib.load(MODEL_PATH)
+if MODEL_PATH.is_file():
+    try:
+        model = joblib.load(MODEL_PATH)
+        print("SMS detection model loaded successfully.")
+    except Exception as exc:
+        print(f"WARNING: SMS model could not be loaded: {exc}")
+else:
+    print(
+        "WARNING: SMS model unavailable. "
+        "URL and UPI scanners remain available."
+    )
 
 
+# Request models
 class ScanRequest(BaseModel):
     message: str
 
@@ -66,12 +81,17 @@ class PaymentScanRequest(BaseModel):
     upi_id: Optional[str] = None
 
 
+# Home endpoint
 @app.get("/")
 def home():
     return {
         "message": "FraudLens AI Backend is running!",
         "modules": [
-            "SMS Fraud Detection (ML: TF-IDF + Logistic Regression)",
+            (
+                "SMS Fraud Detection (ML: TF-IDF + Logistic Regression)"
+                if model is not None
+                else "SMS Fraud Detection (Model artifact unavailable)"
+            ),
             "URL Phishing Scanner (Structural & Lexical Heuristic Analysis)",
             "UPI & Payment Fraud Detection (Heuristic Rule-Based Engine)"
         ],
@@ -79,13 +99,18 @@ def home():
     }
 
 
+# Health endpoint
 @app.get("/health")
 def health_check():
     return {
         "status": "healthy",
         "model_loaded": model is not None,
         "modules": {
-            "sms_scanner": "TF-IDF + Logistic Regression",
+            "sms_scanner": (
+                "TF-IDF + Logistic Regression"
+                if model is not None
+                else "Unavailable - model artifact not installed"
+            ),
             "url_scanner": "Structural Heuristic Rule-Based Engine",
             "payment_scanner": "UPI & Payment Fraud Heuristic Engine"
         },
@@ -94,20 +119,34 @@ def health_check():
 
 
 # ---------------------------------------------------------------------------
-# SMS Fraud Detection Endpoint (Preserved)
+# SMS Fraud Detection Endpoint
 # ---------------------------------------------------------------------------
 @app.post("/scan")
 def scan_message(request: ScanRequest):
     message = request.message.strip()
 
     if not message:
-        raise HTTPException(status_code=400, detail="Message cannot be empty")
+        raise HTTPException(
+            status_code=400,
+            detail="Message cannot be empty"
+        )
+
+    if model is None:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "SMS scanning is unavailable because the model "
+                "artifact is not installed."
+            )
+        )
 
     prediction = int(model.predict([message])[0])
     probabilities = model.predict_proba([message])[0]
 
     fraud_index = list(model.classes_).index(1)
-    fraud_score = round(float(probabilities[fraud_index]) * 100, 2)
+    fraud_score = round(
+        float(probabilities[fraud_index]) * 100, 2
+    )
 
     if prediction == 1:
         risk_level = "POTENTIAL_FRAUD"
@@ -141,21 +180,24 @@ def scan_message(request: ScanRequest):
 
 
 # ---------------------------------------------------------------------------
-# URL Phishing Scanner Endpoint (Preserved)
+# URL Phishing Scanner Endpoint
 # ---------------------------------------------------------------------------
 @app.post("/scan-url")
 def scan_url(request: UrlScanRequest):
     raw_url = request.url.strip()
 
     if not raw_url:
-        raise HTTPException(status_code=400, detail="URL cannot be empty")
+        raise HTTPException(
+            status_code=400,
+            detail="URL cannot be empty"
+        )
 
     analysis_result = analyze_url_structure(raw_url)
     return analysis_result
 
 
 # ---------------------------------------------------------------------------
-# UPI & Payment Fraud Detection Endpoint (New)
+# UPI & Payment Fraud Detection Endpoint
 # ---------------------------------------------------------------------------
 @app.post("/scan-payment")
 def scan_payment(request: PaymentScanRequest):
@@ -163,12 +205,25 @@ def scan_payment(request: PaymentScanRequest):
     vpa = (request.upi_id or "").strip() if request.upi_id else None
 
     if not msg and not vpa:
-        raise HTTPException(status_code=400, detail="Please provide payment message text or a UPI ID to analyze.")
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Please provide payment message text or a UPI ID "
+                "to analyze."
+            )
+        )
 
     analysis_result = analyze_payment_fraud(msg, vpa)
     return analysis_result
 
 
+# Run the application
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)
+
+    uvicorn.run(
+        "backend.main:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True
+    )
